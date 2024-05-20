@@ -2,7 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tkinter as tk
 from scipy.io.wavfile import write
-import sounddevice as sd  # For playing audio
+import sounddevice as sd
+
+from html2python import generate_waveform  # For playing audio
 
 class WaveformGenerator:
     def __init__(self, master):
@@ -10,12 +12,12 @@ class WaveformGenerator:
         master.title("Waveform Generator")
         self.amplitude = tk.DoubleVar(value=10)
         self.frequency = tk.DoubleVar(value=500)
-        self.min_frequency = tk.DoubleVar(value=500)
-        self.max_frequency = tk.DoubleVar(value=4000)
+        self.min_frequency = tk.DoubleVar(value=1000)
+        self.max_frequency = tk.DoubleVar(value=2000)
         self.sampleRate = tk.DoubleVar(value=44100)  # Adjust as needed
-        self.duration = tk.DoubleVar(value=0.2)  # 12s
+        self.duration = tk.DoubleVar(value=2)  # 5s
         self.waveform_type = tk.StringVar(value="Sine")
-        self.frequency_type = tk.StringVar(value="Ascending")
+        self.frequency_type = tk.StringVar(value="ascending")
         self.frequency_step = tk.DoubleVar(value=100)  # 100hz
         self.frequency_sdouble = tk.BooleanVar(value=False)
         self.loop_audio = tk.BooleanVar(value=False)  # Initialize loop_audio
@@ -40,7 +42,7 @@ class WaveformGenerator:
         tk.Checkbutton(master, text="(Step double)", variable=self.loop_audio).grid(row=4, column=2, columnspan=1)  
 
         tk.Label(master, text="Frequency type*").grid(row=5, column=0)  
-        tk.OptionMenu(master, self.frequency_type, "Ascending", "Descending").grid(row=5, column=1, columnspan=2)  
+        tk.OptionMenu(master, self.frequency_type, "ascending", "descending").grid(row=5, column=1, columnspan=2)  
         
         tk.Label(master, text="Waveform Type*").grid(row=6, column=0)  
         tk.OptionMenu(master, self.waveform_type, "Sine", "Square", "Sawtooth", "Triangle").grid(row=6, column=1, columnspan=2)
@@ -61,23 +63,24 @@ class WaveformGenerator:
     def review(self):
         self.execute01()
 
-
     def execute01(self):
         global scaled_waveform
-        duration_seconds = self.duration.get()
-        num_samples = int(self.sampleRate.get() * duration_seconds)
-        t = np.linspace(0, duration_seconds, num_samples)  # Adjust time array
-        
-        if self.waveform_type.get() == "Sine":
-            y = self.amplitude.get() * np.sin(2 * np.pi * self.frequency.get() * t)
-        elif self.waveform_type.get() == "Square":
-            y = self.amplitude.get() * np.sign(np.sin(2 * np.pi * self.frequency.get() * t))
-        elif self.waveform_type.get() == "Sawtooth":
-            y = self.amplitude.get() * (2 * (self.frequency.get() * t - np.floor(0.5 + self.frequency.get() * t)) - 1)
-        elif self.waveform_type.get() == "Triangle":
-            y = self.amplitude.get() * np.abs(2 * (self.frequency.get() * t - np.floor(self.frequency.get() * t + 0.5))) - 1
-        else:
-            print("to be defined!!!")
+        # duration_seconds = self.duration.get()
+        # num_samples = int(self.sampleRate.get() * duration_seconds)
+        # t = np.linspace(0, duration_seconds, num_samples)  # Adjust time array
+
+        # if self.waveform_type.get() == "Sine":
+        #     y = self.amplitude.get() * np.sin(2 * np.pi * self.frequency.get() * t)
+        # elif self.waveform_type.get() == "Square":
+        #     y = self.amplitude.get() * np.sign(np.sin(2 * np.pi * self.frequency.get() * t))
+        # elif self.waveform_type.get() == "Sawtooth":
+        #     y = self.amplitude.get() * (2 * (self.frequency.get() * t - np.floor(0.5 + self.frequency.get() * t)) - 1)
+        # elif self.waveform_type.get() == "Triangle":
+        #     y = self.amplitude.get() * np.abs(2 * (self.frequency.get() * t - np.floor(self.frequency.get() * t + 0.5))) - 1
+        # else:
+        #     print("to be defined!!!")
+
+        t, y = generate_waveform(self.min_frequency.get(), self.max_frequency.get(), self.duration.get(), 100, self.frequency_type.get(), False) 
 
         # Scale the waveform to 16-bit PCM format
         scaled_waveform = np.int16(y * 32767)
