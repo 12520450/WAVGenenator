@@ -88,7 +88,35 @@ class WaveformGenerator:
         # else:
         #     print("to be defined!!!")
 
-        t, y = generate_waveform(self.min_frequency.get(), self.max_frequency.get(), self.duration.get(), self.amplitude.get(), self.frequency_type.get(), self.waveform_type.get(), False) 
+        # t, y = generate_waveform(self.min_frequency.get(), self.max_frequency.get(), self.duration.get(), self.amplitude.get(), self.frequency_type.get(), self.waveform_type.get(), False) 
+
+        global scaled_waveform
+        duration_seconds = self.duration.get()
+        min_frequency = self.min_frequency.get()
+        max_frequency =  self.max_frequency.get()
+        step_freqeuncy = self.frequency_step.get()
+        frequency_type = self.frequency_type.get()
+
+        num_samples = int(self.sampleRate.get() * duration_seconds)
+        t = np.linspace(0, duration_seconds, num_samples)  # Adjust time array
+
+        if self.frequency_type.get() == "Ascending":
+            timecount = calcuated_numsamples(min_frequency, max_frequency, step_freqeuncy)
+            print("num_samples: ", num_samples)
+            updated_frequency = np.linspace(min_frequency, max_frequency, int(timecount))
+            print("updated_frequency: ", updated_frequency)
+        
+        for updated_frequency in range(updated_frequency):
+            if self.waveform_type.get() == "Sine":
+                y = self.amplitude.get() * np.sin(2 * np.pi * updated_frequency * t)
+            elif self.waveform_type.get() == "Square":
+                y = self.amplitude.get() * np.sign(np.sin(2 * np.pi * updated_frequency * t))
+            elif self.waveform_type.get() == "Sawtooth":
+                y = self.amplitude.get() * (2 * (updated_frequency * t - np.floor(0.5 + updated_frequency * t)) - 1)
+            elif self.waveform_type.get() == "Triangle":
+                y = self.amplitude.get() * np.abs(2 * (updated_frequency * t - np.floor(updated_frequency * t + 0.5))) - 1
+            else:
+                print("to be defined!!!")
 
         # Scale the waveform to 16-bit PCM format
         scaled_waveform = np.int16(y * 32767)
