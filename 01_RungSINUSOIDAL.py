@@ -15,31 +15,52 @@ class WaveformGenerator:
         self.sampleRate = tk.DoubleVar(value=44100)  # Adjust as needed
         self.duration = tk.DoubleVar(value=0.2)  # 12s
         self.waveform_type = tk.StringVar(value="Sine")
+        self.frequency_type = tk.StringVar(value="Ascending")
+        self.frequency_step = tk.DoubleVar(value=100)  # 100hz
+        self.frequency_sdouble = tk.BooleanVar(value=False)
         self.loop_audio = tk.BooleanVar(value=False)  # Initialize loop_audio
         self.is_playing = False
 
-        tk.Label(master, text="SampleRate:").grid(row=0, column=0)
+        tk.Label(master, text="SampleRate*").grid(row=0, column=0)
         tk.Entry(master, textvariable=self.sampleRate).grid(row=0, column=1)
-        tk.Label(master, text="Amplitude:").grid(row=1, column=0)  
+
+        tk.Label(master, text="Amplitude*").grid(row=1, column=0)  
         tk.Entry(master, textvariable=self.amplitude).grid(row=1, column=1)  
-        tk.Label(master, text="Frequency:").grid(row=2, column=0)
+
+        tk.Label(master, text="Frequency*").grid(row=2, column=0)
         tk.Entry(master, textvariable=self.frequency).grid(row=2, column=1)
 
-        tk.Label(master, text="Frequency Min:").grid(row=3, column=0)
-        tk.Entry(master, textvariable=self.frequency).grid(row=3, column=1)
-        tk.Label(master, text="Frequency Max:").grid(row=3, column=2)
-        tk.Entry(master, textvariable=self.frequency).grid(row=3, column=3)
+        tk.Label(master, text="Min*").grid(row=3, column=0)
+        tk.Entry(master, textvariable=self.min_frequency).grid(row=3, column=1)
+        tk.Label(master, text="Max*").grid(row=3, column=2)
+        tk.Entry(master, textvariable=self.max_frequency).grid(row=3, column=3)
+        
+        tk.Label(master, text="Step up/down").grid(row=4, column=0)  
+        tk.Entry(master, textvariable=self.frequency_step).grid(row=4, column=1)
+        tk.Checkbutton(master, text="(Step double)", variable=self.loop_audio).grid(row=4, column=2, columnspan=1)  
 
-        tk.Label(master, text="Duration:").grid(row=4, column=0)
-        tk.Entry(master, textvariable=self.duration).grid(row=4, column=1)
-        tk.Checkbutton(master, text="Loop", variable=self.loop_audio).grid(row=4, column=2, columnspan=2)  
-        tk.Label(master, text="Waveform Type:").grid(row=5, column=0)  
-        tk.OptionMenu(master, self.waveform_type, "Sine", "Square", "Sawtooth", "Triangle").grid(row=5, column=1, columnspan=2)  
+        tk.Label(master, text="Frequency type*").grid(row=5, column=0)  
+        tk.OptionMenu(master, self.frequency_type, "Ascending", "Descending").grid(row=5, column=1, columnspan=2)  
+        
+        tk.Label(master, text="Waveform Type*").grid(row=6, column=0)  
+        tk.OptionMenu(master, self.waveform_type, "Sine", "Square", "Sawtooth", "Triangle").grid(row=6, column=1, columnspan=2)
+
+
+        # Create a button to review
+        # tk.Label(master, text="Duration:").grid(row=5, column=0)
+        # tk.Entry(master, textvariable=self.duration).grid(row=5, column=1)
+        tk.Button(master, text="(Review)", command=self.review).grid(row=7, column=0, columnspan=2)
 
         # Create a button to start/stop the loop
-        tk.Button(master, text="Start", command=self.start_audio).grid(row=6, column=0, columnspan=2)
-        tk.Button(master, text="Stop", command=self.stop_audio).grid(row=6, column=1, columnspan=1)
+        # tk.Checkbutton(master, text="Loop", variable=self.loop_audio).grid(row=7, column=0, columnspan=2)  
+        tk.Button(master, text="Play", command=self.start_audio).grid(row=7, column=2, columnspan=2)
+        tk.Button(master, text="Stop", command=self.stop_audio).grid(row=7, column=3, columnspan=1)
         
+    
+    # To display the wave chart before start playing
+    def review(self):
+        self.execute01()
+
 
     def execute01(self):
         global scaled_waveform
