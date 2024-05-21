@@ -40,7 +40,7 @@ class WaveformGenerator:
         t = np.linspace(0, duration_seconds, num_samples)  # Adjust time array
         
         if self.waveform_type.get() == "Sine":
-            y = self.amplitude.get() * np.sin(2 * np.pi * self.frequency.get() * t)
+            y = self.amplitude.get() * np.sin(2 * np.pi * self.frequency.get()+10 * t)
         elif self.waveform_type.get() == "Square":
             y = self.amplitude.get() * np.sign(np.sin(2 * np.pi * self.frequency.get() * t))
         elif self.waveform_type.get() == "Sawtooth":

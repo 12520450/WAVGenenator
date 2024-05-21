@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sounddevice as sd
 
-def generate_waveform(min_frequency, max_frequency, duration, volume, waveform_type, loop):
+def generate_waveform(min_frequency, max_frequency, duration, volume, frequency_type,waveform_type, loop):
     sample_rate = 44100  # Adjust as needed
     buffer_size = int(sample_rate * duration)
     t = np.linspace(0, duration, buffer_size, endpoint=False)
@@ -10,14 +10,36 @@ def generate_waveform(min_frequency, max_frequency, duration, volume, waveform_t
 
     for i in range(buffer_size):
         current_frequency = min_frequency
-        if waveform_type == "ascending":
+        if frequency_type == "ascending":
             current_frequency = min_frequency + ((max_frequency - min_frequency) * (i / buffer_size))
-        elif waveform_type == "descending":
+        elif frequency_type == "descending":
             current_frequency = max_frequency - ((max_frequency - min_frequency) * (i / buffer_size))
-        elif waveform_type == "random":
+        elif frequency_type == "random":
             current_frequency = min_frequency + np.random.random() * (max_frequency - min_frequency)
 
         data[i] = np.sin(2 * np.pi * current_frequency * t[i]) * volume
+
+        if waveform_type == "Sine":
+            data[i] = np.sin(2 * np.pi * current_frequency * t[i]) * volume
+        elif waveform_type == "Square":
+            data[i] = np.sign(np.sin(2 * np.pi * current_frequency * t[i])) * volume
+        # elif waveform_type == "Sawtooth":
+            
+        # elif waveform_type == "Triangle":
+        #     # <tbd>
+        # else:
+        #     print("to be defined!!!")
+
+        # if self.waveform_type.get() == "Sine":
+        #     y = self.amplitude.get() * np.sin(2 * np.pi * self.frequency.get() * t)
+        # elif self.waveform_type.get() == "Square":
+        #     y = self.amplitude.get() * np.sign(np.sin(2 * np.pi * self.frequency.get() * t))
+        # elif self.waveform_type.get() == "Sawtooth":
+        #     y = self.amplitude.get() * (2 * (self.frequency.get() * t - np.floor(0.5 + self.frequency.get() * t)) - 1)
+        # elif self.waveform_type.get() == "Triangle":
+        #     y = self.amplitude.get() * np.abs(2 * (self.frequency.get() * t - np.floor(self.frequency.get() * t + 0.5))) - 1
+        # else:
+        #     print("to be defined!!!")
 
     if loop:
         data = np.tile(data, int(sample_rate * duration / buffer_size))

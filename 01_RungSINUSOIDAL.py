@@ -80,7 +80,7 @@ class WaveformGenerator:
         # else:
         #     print("to be defined!!!")
 
-        t, y = generate_waveform(self.min_frequency.get(), self.max_frequency.get(), self.duration.get(), 100, self.frequency_type.get(), False) 
+        t, y = generate_waveform(self.min_frequency.get(), self.max_frequency.get(), self.duration.get(), self.amplitude.get(), self.frequency_type.get(), self.waveform_type.get(), False) 
 
         # Scale the waveform to 16-bit PCM format
         scaled_waveform = np.int16(y * 32767)
