@@ -20,10 +20,10 @@ class WaveformGenerator:
         master.title("Waveform Generator")
         self.amplitude = tk.DoubleVar(value=10)
         self.frequency = tk.DoubleVar(value=500)
-        self.min_frequency = tk.DoubleVar(value=1000)
+        self.min_frequency = tk.DoubleVar(value=1)
         self.max_frequency = tk.DoubleVar(value=2000)
         self.sampleRate = tk.DoubleVar(value=44100)  # Adjust as needed
-        self.duration = tk.DoubleVar(value=2)  # 5s
+        self.duration = tk.DoubleVar(value=1)  # 5s
         self.waveform_type = tk.StringVar(value="Sine")
         self.frequency_type = tk.StringVar(value="ascending")
         self.frequency_step = tk.DoubleVar(value=100)  # 100hz
@@ -99,24 +99,29 @@ class WaveformGenerator:
 
         num_samples = int(self.sampleRate.get() * duration_seconds)
         t = np.linspace(0, duration_seconds, num_samples)  # Adjust time array
+        y = np.zeros(num_samples)
 
-        if self.frequency_type.get() == "Ascending":
-            timecount = calcuated_numsamples(min_frequency, max_frequency, step_freqeuncy)
-            print("num_samples: ", num_samples)
-            updated_frequency = np.linspace(min_frequency, max_frequency, int(timecount))
-            print("updated_frequency: ", updated_frequency)
+        # if self.frequency_type.get() == "ascending":
+        timecount = calcuated_numsamples(min_frequency, max_frequency, step_freqeuncy)
+        print("num_samples: ", num_samples)
+        updated_frequency = np.linspace(min_frequency, max_frequency, int(timecount))
+        print("updated_frequency: ", updated_frequency)
         
-        for updated_frequency in range(updated_frequency):
+        for i in range(num_samples):
+            frequency = min_frequency + ((max_frequency - min_frequency) * (i / num_samples))
             if self.waveform_type.get() == "Sine":
-                y = self.amplitude.get() * np.sin(2 * np.pi * updated_frequency * t)
-            elif self.waveform_type.get() == "Square":
-                y = self.amplitude.get() * np.sign(np.sin(2 * np.pi * updated_frequency * t))
-            elif self.waveform_type.get() == "Sawtooth":
-                y = self.amplitude.get() * (2 * (updated_frequency * t - np.floor(0.5 + updated_frequency * t)) - 1)
-            elif self.waveform_type.get() == "Triangle":
-                y = self.amplitude.get() * np.abs(2 * (updated_frequency * t - np.floor(updated_frequency * t + 0.5))) - 1
-            else:
-                print("to be defined!!!")
+                y[i] = self.amplitude.get() * np.sin(2 * np.pi * frequency * t[i])
+            # elif self.waveform_type.get() == "Square":
+            #     y += self.amplitude.get() * np.sign(np.sin(2 * np.pi * frequency * t))
+            # elif self.waveform_type.get() == "Sawtooth":
+            #     y += self.amplitude.get() * (2 * (frequency * t - np.floor(0.5 + frequency * t)) - 1)
+            # elif self.waveform_type.get() == "Triangle":
+            #     y += self.amplitude.get() * np.abs(2 * (frequency * t - np.floor(frequency * t + 0.5))) - 1
+            # else:
+            #     raise ValueError(f"Unknown waveform type: {self.waveform_type.get()}")
+            
+                # print(t,":", y[i])
+
 
         # Scale the waveform to 16-bit PCM format
         scaled_waveform = np.int16(y * 32767)
@@ -125,7 +130,6 @@ class WaveformGenerator:
         plt.clf()
         plt.plot(t, y)
         plt.show()
-        print(t,":", y)
     
     def stop_audio(self):
         sd.stop()
