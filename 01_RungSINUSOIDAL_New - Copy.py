@@ -102,7 +102,6 @@ class WaveformGenerator:
         print("- updated_frequency: ", updated_frequency)
         
         for frequency in updated_frequency:
-            print("-- frequency: ", frequency)
             if self.waveform_type.get() == "Sine":
                 y = self.amplitude.get() * np.sin(2 * np.pi * frequency * t)
             elif self.waveform_type.get() == "Square":
@@ -114,7 +113,7 @@ class WaveformGenerator:
             else:
                 raise ValueError(f"Unknown waveform type: {self.waveform_type.get()}")
             
-            print("-- frequency:", frequency, "y:", y)
+            # print("-- frequency:", frequency, "y:", y)
         
         # Scale the waveform to 16-bit PCM format
         scaled_waveform = np.int16(y * 32767)
