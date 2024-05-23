@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from scipy.io.wavfile import write
 import sounddevice as sd
-from mywaveform import generate_waveform
+from mywaveform import generate_waveformAuto, generate_waveformManual, generate_waveformDouble
+
 
 
 def calcuated_numsamples(min_frequency, max_frequency, step):
@@ -25,8 +26,8 @@ class WaveformGenerator:
         self.sampleRate = tk.DoubleVar(value=44100)  # Adjust as needed
         self.duration = tk.DoubleVar(value=1)  # 5s
         self.waveform_type = tk.StringVar(value="Sine")
-        self.frequency_type = tk.StringVar(value="ascending")
-        self.frequency_step = tk.DoubleVar(value=100)  # 100hz
+        self.frequency_type = tk.StringVar(value="Ascending")
+        self.frequency_step = tk.DoubleVar(value=0)  # 100hz
         self.frequency_sdouble = tk.BooleanVar(value=False)
         self.loop_audio = tk.DoubleVar(value=1)  # Initialize loop_audio
         self.is_playing = False
@@ -45,9 +46,9 @@ class WaveformGenerator:
         tk.Label(master, text="Max*").grid(row=3, column=2)
         tk.Entry(master, textvariable=self.max_frequency).grid(row=3, column=3)
         
-        tk.Label(master, text="Step up/down").grid(row=4, column=0)  
+        tk.Label(master, text="Manual Step").grid(row=4, column=0)  
         tk.Entry(master, textvariable=self.frequency_step).grid(row=4, column=1)
-        tk.Checkbutton(master, text="(Step double)", variable=self.frequency_sdouble).grid(row=4, column=2, columnspan=1)  
+        tk.Checkbutton(master, text="(Double)", variable=self.frequency_sdouble).grid(row=4, column=2, columnspan=1)  
 
         tk.Label(master, text="Frequency type*").grid(row=5, column=0)  
         tk.OptionMenu(master, self.frequency_type, "Ascending", "Descending","Keeping","Random").grid(row=5, column=1, columnspan=2)  
@@ -79,40 +80,18 @@ class WaveformGenerator:
         min_frequency = self.min_frequency.get()
         max_frequency =  self.max_frequency.get()
         step_freqeuncy = self.frequency_step.get()
+        sdouble_frequency = self.frequency_sdouble.get()
         frequency_type = self.frequency_type.get()
 
-
-        # num_samples = int(self.sampleRate.get() * duration_seconds)
-        # t = np.linspace(0, duration_seconds, num_samples)  # Adjust time array
-        # y = np.zeros(num_samples)
-
-        # # if self.frequency_type.get() == "ascending":
-        # timecount = calcuated_numsamples(min_frequency, max_frequency, step_freqeuncy)
-        # print("num_samples: ", num_samples)
-        # updated_frequency = np.linspace(min_frequency, max_frequency, int(timecount)+1)
-        # print("updated_frequency: ", updated_frequency)
-        
-        # for i in range(num_samples):
-        #     # frequency = min_frequency + ((max_frequency - min_frequency) * (i / num_samples))
-            
-        #     # Map i to the nearest multiple of int(timecount)
-        #     frequency = int(i // (int(timecount)+1)) * (int(timecount)+1)
-        #     print("int(timecount): ", int(timecount))
-        #     print("frequency: ", frequency)
-        #     if self.waveform_type.get() == "Sine":
-        #         y[i] = self.amplitude.get() * np.sin(2 * np.pi * frequency * t[i])
-        #     # elif self.waveform_type.get() == "Square":
-        #     #     y += self.amplitude.get() * np.sign(np.sin(2 * np.pi * frequency * t))
-        #     # elif self.waveform_type.get() == "Sawtooth":
-        #     #     y += self.amplitude.get() * (2 * (frequency * t - np.floor(0.5 + frequency * t)) - 1)
-        #     # elif self.waveform_type.get() == "Triangle":
-        #     #     y += self.amplitude.get() * np.abs(2 * (frequency * t - np.floor(frequency * t + 0.5))) - 1
-        #     # else:
-        #     #     raise ValueError(f"Unknown waveform type: {self.waveform_type.get()}")
-            
-        #     # print("i:", i, "frequency:", frequency)
-
-        scaled_waveform, t, sine_wave, frequencies  = generate_waveform(waveform_type, min_frequency, max_frequency, duration_seconds, 1, frequency_type, 1)
+        if (sdouble_frequency == True):
+            scaled_waveform, t, sine_wave, frequencies  = generate_waveformDouble(waveform_type, min_frequency, max_frequency, duration_seconds, 1, frequency_type, 1)
+        elif (step_freqeuncy > 0):
+            scaled_waveform, t, sine_wave, frequencies  = generate_waveformManual(waveform_type, min_frequency, max_frequency, duration_seconds, 1, frequency_type, 1, step_freqeuncy)
+        elif((sdouble_frequency == False) and (step_freqeuncy == 0)): # Auto
+            scaled_waveform, t, sine_wave, frequencies  = generate_waveformAuto(waveform_type, min_frequency, max_frequency, duration_seconds, 1, frequency_type, 1)
+        else:
+            print("to be defined")
+            scaled_waveform, t, sine_wave, frequencies  = generate_waveformDouble(waveform_type, min_frequency, max_frequency, duration_seconds, 1, frequency_type, 1)
 
         # Create the sine wave plot
         plt.clf()
