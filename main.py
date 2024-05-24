@@ -30,7 +30,7 @@ class WaveformGenerator:
         self.frequency_step = tk.DoubleVar(value=0)  # 100hz
         self.frequency_sdouble = tk.BooleanVar(value=False)
         self.loop_audio = tk.DoubleVar(value=1)  # Initialize loop_audio
-        self.is_playing = False
+        self.is_playing = tk.DoubleVar(value=1)
 
         tk.Label(master, text="SampleRate*").grid(row=0, column=0)
         tk.Entry(master, textvariable=self.sampleRate).grid(row=0, column=1)
@@ -114,15 +114,14 @@ class WaveformGenerator:
     
     def stop_audio(self):
         sd.stop()
-        # Stop the loop_audio flag
-        # self.loop_audio.set(False)
-        self.is_playing = False
+        self.is_playing = 0
 
     def play_audio(self):
         # while self.loop_audio.get():
         while self.is_playing:
             sd.play(scaled_waveform, self.sampleRate.get())
             sd.wait()
+            self.is_playing = self.is_playing - 1
 
     def start_audio(self):
         self.execute01()
