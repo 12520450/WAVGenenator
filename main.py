@@ -30,7 +30,9 @@ class WaveformGenerator:
         self.frequency_step = tk.DoubleVar(value=0)  # 100hz
         self.frequency_sdouble = tk.BooleanVar(value=False)
         self.loop_audio = tk.DoubleVar(value=1)  # Initialize loop_audio
+        
         self.is_playing = tk.DoubleVar(value=1)
+        self.loop_thread = None
 
         tk.Label(master, text="SampleRate*").grid(row=0, column=0)
         tk.Entry(master, textvariable=self.sampleRate).grid(row=0, column=1)
@@ -115,21 +117,26 @@ class WaveformGenerator:
     def stop_audio(self):
         sd.stop()
         self.is_playing = 0
+        if self.loop_thread is not None:
+            self.loop_thread = None
 
     def play_audio(self):
-        # while self.loop_audio.get():
-        while self.is_playing:
+        while self.is_playing > 0:
             sd.play(scaled_waveform, self.sampleRate.get())
-            sd.wait()
+            while sd.get_stream().active:
+                if not self.is_playing:
+                    sd.stop()  # Stop the sound immediately
+                    break
             self.is_playing = self.is_playing - 1
+
 
     def start_audio(self):
         self.execute01()
-        sd.play(scaled_waveform, self.sampleRate.get())
+        # sd.play(scaled_waveform, self.sampleRate.get())
 
         # if self.loop_audio.get():
         self.is_playing = self.loop_audio.get()
-        if self.is_playing:
+        if self.is_playing > 0:
             # Start a separate thread or asynchronous task for looping playback
             import threading
             loop_thread = threading.Thread(target=self.play_audio)
