@@ -59,7 +59,6 @@ class WaveformGenerator:
         tk.OptionMenu(master, self.waveform_type, "Sine", "Square", "Sawtooth", "Triangle").grid(row=6, column=1, columnspan=2)
         tk.Button(master, text="(Review)", command=self.review).grid(row=6, column=2, columnspan=2)
 
-
         # Create a button to review
         tk.Label(master, text="Duration(s)*").grid(row=7, column=0)
         tk.Entry(master, textvariable=self.duration).grid(row=7, column=1)
@@ -68,8 +67,8 @@ class WaveformGenerator:
         # Create a button to start/stop the loop
         tk.Label(master, text="Loop").grid(row=7, column=2)
         tk.Entry(master, textvariable=self.loop_audio).grid(row=7, column=3)
-        tk.Button(master, text="Play", command=self.start_audio).grid(row=7, column=4, columnspan=1)
-        tk.Button(master, text="Stop", command=self.stop_audio).grid(row=7, column=5, columnspan=1)
+        tk.Button(master, text="▶ Play", command=self.start_audio).grid(row=7, column=4, columnspan=1)
+        tk.Button(master, text="⏹ Stop", command=self.stop_audio).grid(row=7, column=5, columnspan=1)
         
     
     # To display the wave chart before start playing
@@ -129,6 +128,7 @@ class WaveformGenerator:
                     sd.stop()  # Stop the sound immediately
                     break
             self.is_playing = self.is_playing - 1
+            
 
 
     def start_audio(self):
