@@ -30,7 +30,10 @@ class WaveformGenerator:
         self.frequency_step = tk.DoubleVar(value=0)  # 100hz
         self.frequency_sdouble = tk.BooleanVar(value=False)
         self.loop_audio = tk.DoubleVar(value=1)  # Initialize loop_audio
-        
+
+        # Initialize remaining time (in milliseconds)
+        self.remaining_time = int(self.loop_audio.get()*self.duration.get())
+
         self.is_playing = tk.DoubleVar(value=1)
         self.loop_thread = None
 
@@ -69,10 +72,16 @@ class WaveformGenerator:
         tk.Entry(master, textvariable=self.loop_audio).grid(row=7, column=3)
         tk.Button(master, text="▶ Play", command=self.start_audio).grid(row=7, column=4, columnspan=1)
         tk.Button(master, text="⏹ Stop", command=self.stop_audio).grid(row=7, column=5, columnspan=1)
-        
-    
-    # To display the wave chart before start playing
+
+        # Create a label to display remaining time
+        self.remaining_time_label = tk.Label(master, text="Remaining time: {} s".format(self.remaining_time))
+        self.remaining_time_label.grid(row=8, column=0, columnspan=2)
+
+    # # To display the wave chart before start playing
     def review(self):
+        # Display the remaining loop
+        remaining = int(self.loop_audio.get() *self.duration.get())
+        self.remaining_time_label.config(text="Remaining time: {} s".format(remaining))
         self.execute01()
 
     def execute01(self):
@@ -121,6 +130,7 @@ class WaveformGenerator:
             self.loop_thread = None
 
     def play_audio(self):
+        # Play audio until no loop remaining
         while self.is_playing > 0:
             sd.play(scaled_waveform, self.sampleRate.get())
             while sd.get_stream().active:
@@ -128,14 +138,15 @@ class WaveformGenerator:
                     sd.stop()  # Stop the sound immediately
                     break
             self.is_playing = self.is_playing - 1
+
+            # Display the remaining loop
+            remaining = int(self.is_playing *self.duration.get())
+            self.remaining_time_label.config(text="Remaining time: {} s".format(remaining))
             
 
-
     def start_audio(self):
-        self.execute01()
-        # sd.play(scaled_waveform, self.sampleRate.get())
+        self.review()
 
-        # if self.loop_audio.get():
         self.is_playing = self.loop_audio.get()
         if self.is_playing > 0:
             # Start a separate thread or asynchronous task for looping playback
